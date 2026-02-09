@@ -35,7 +35,8 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 # ANTES: ALLOWED_HOSTS = []
 # DEPOIS: Usando variável de ambiente para produção
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1',"jreginato.pythonanywhere.com",
+).split(',')
 
 
 # Application definition
