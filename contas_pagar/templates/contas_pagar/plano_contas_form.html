@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if modo == "criar" %}
+Novo Plano de Contas
+{% else %}
+Editar Plano de Contas
+{% endif %}
+{% endblock %}
+
+{% block breadcrumb %}
+<div class="row mb-2">
+  <div class="col-sm-6">
+    <h1>{% if modo == "criar" %}Novo{% else %}Editar{% endif %} Plano de Contas</h1>
+  </div>
+  <div class="col-sm-6">
+    <ol class="breadcrumb float-sm-right">
+      <li class="breadcrumb-item"><a href="#">Financeiro</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'plano_contas_lista' %}">Plano de Contas</a></li>
+      <li class="breadcrumb-item active">{% if modo == "criar" %}Novo{% else %}Editar{% endif %}</li>
+    </ol>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">{% if modo == "criar" %}Cadastro de Novo{% else %}Edição de{% endif %} Plano de Contas</h3>
+      </div>
+      <form method="post" class="card-body">
+        {% csrf_token %}
+
+        <!-- Informações Básicas -->
+        <fieldset>
+          <legend class="border-bottom mb-3">Informações Básicas</legend>
+
+          <div class="form-row">
+            <div class="form-group col-md-3">
+              <label for="{{ form.codigo.id_for_label }}">Código *</label>
+              {{ form.codigo }}
+              {% if form.codigo.errors %}
+                <div class="invalid-feedback d-block">
+                  {{ form.codigo.errors }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group col-md-9">
+              <label for="{{ form.nome.id_for_label }}">Nome *</label>
+              {{ form.nome }}
+              {% if form.nome.errors %}
+                <div class="invalid-feedback d-block">
+                  {{ form.nome.errors }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="{{ form.tipo.id_for_label }}">Tipo *</label>
+            {{ form.tipo }}
+            {% if form.tipo.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.tipo.errors }}
+              </div>
+            {% endif %}
+          </div>
+        </fieldset>
+
+        <!-- Hierarquia -->
+        <fieldset class="mt-4">
+          <legend class="border-bottom mb-3">Hierarquia</legend>
+
+          <div class="form-group">
+            <label for="{{ form.pai.id_for_label }}">Conta Pai</label>
+            {{ form.pai }}
+            <small class="form-text text-muted">
+              Deixe em branco se for uma conta de topo.
+            </small>
+            {% if form.pai.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.pai.errors }}
+              </div>
+            {% endif %}
+          </div>
+        </fieldset>
+
+        <!-- Botões -->
+        <div class="form-group border-top pt-3 mt-4">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i>
+            {% if modo == "criar" %}Cadastrar{% else %}Salvar{% endif %}
+          </button>
+          <a href="{% url 'plano_contas_lista' %}" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Cancelar
+          </a>
+        </div>
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger mt-3">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $(".select2").select2({
+      allowClear: true,
+      placeholder: "Selecione..."
+    });
+  });
+</script>
+{% endblock %}

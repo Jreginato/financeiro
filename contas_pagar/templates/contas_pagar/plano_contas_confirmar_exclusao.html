@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}
+Excluir Plano de Contas
+{% endblock %}
+
+{% block breadcrumb %}
+<div class="row mb-2">
+  <div class="col-sm-6">
+    <h1>Excluir Plano de Contas</h1>
+  </div>
+  <div class="col-sm-6">
+    <ol class="breadcrumb float-sm-right">
+      <li class="breadcrumb-item"><a href="#">Financeiro</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'plano_contas_lista' %}">Plano de Contas</a></li>
+      <li class="breadcrumb-item active">Excluir</li>
+    </ol>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-6 offset-md-3">
+    <div class="card card-danger">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-exclamation-triangle"></i> Confirmação de Exclusão
+        </h3>
+      </div>
+      <div class="card-body">
+        <p class="text-muted">Tem certeza que deseja excluir o plano de contas abaixo?</p>
+
+        <div class="card card-light mb-4">
+          <div class="card-body">
+            <dl class="row">
+              <dt class="col-sm-4">Código:</dt>
+              <dd class="col-sm-8"><strong>{{ plano.codigo }}</strong></dd>
+
+              <dt class="col-sm-4">Nome:</dt>
+              <dd class="col-sm-8">{{ plano.nome }}</dd>
+
+              <dt class="col-sm-4">Tipo:</dt>
+              <dd class="col-sm-8">
+                <span class="badge badge-info">{{ plano.get_tipo_display }}</span>
+              </dd>
+
+              {% if plano.pai %}
+                <dt class="col-sm-4">Conta Pai:</dt>
+                <dd class="col-sm-8">{{ plano.pai.codigo }} - {{ plano.pai.nome }}</dd>
+              {% endif %}
+            </dl>
+          </div>
+        </div>
+
+        <div class="alert alert-warning">
+          <i class="fas fa-info-circle"></i>
+          <strong>Atenção!</strong> Esta ação não pode ser desfeita.
+        </div>
+      </div>
+      <div class="card-footer">
+        <form method="post" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Excluir
+          </button>
+        </form>
+        <a href="{% url 'plano_contas_lista' %}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

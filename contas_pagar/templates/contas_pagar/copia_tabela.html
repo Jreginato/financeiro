@@ -1,0 +1,72 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-info text-white">
+        <h3 class="card-title mb-0">
+            <i class="fa fa-copy"></i> Cópia de Contas Selecionadas
+        </h3>
+    </div>
+
+    <form method="POST" action="{% url 'contas_pagar_copia_confirmar' %}">
+        {% csrf_token %}
+
+        <table class="table table-bordered table-striped mt-3">
+            <thead>
+                <tr>
+                    <th>Descrição</th>
+                    <th>Fornecedor</th>
+                    <th>Valor da Cópia</th>
+                    <th>Data de Vencimento</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for conta in contas %}
+                <tr>
+                    <td>
+                        <input type="text"
+                               name="descricao_{{ conta.id }}"
+                               class="form-control"
+                               value="{{ conta.descricao }}">
+                    </td>
+                    <td>{{ conta.fornecedor }}</td>
+                    <td>
+                        <input type="text"
+                               name="valor_{{ conta.id }}"
+                               class="form-control money"
+                               value="{{ conta.valor }}">
+                    </td>
+
+                    <td>
+                        <input type="date"
+                               name="data_vencimento_{{ conta.id }}"
+                               class="form-control"
+                               value="{{ hoje }}">
+                    </td>
+
+                    <input type="hidden" name="contas" value="{{ conta.id }}">
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="card-footer text-right">
+            <button class="btn btn-info">
+                <i class="fa fa-check"></i> Confirmar Cópia
+            </button>
+
+            <a href="{% url 'contas_pagar_lista' %}" class="btn btn-secondary">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script>
+$('.money').mask('000.000.000,00', {reverse: true});
+</script>
+
+{% endblock %}

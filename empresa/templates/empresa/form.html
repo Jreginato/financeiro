@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+    {% if modo == "criar" %}
+        Nova empresa
+    {% else %}
+        Editar empresa #{{ empresa.id }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h3 class="card-title mb-0">
+            {% if modo == "criar" %}
+                <i class="fa fa-plus-circle"></i> Nova empresa
+            {% else %}
+                <i class="fa fa-edit"></i> Editar empresa
+            {% endif %}
+        </h3>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+        {% if form.errors %}
+            <div class="alert alert-warning">Existem erros no formulário. Verifique os campos marcados.</div>
+        {% endif %}
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8 mb-3">
+                    <label class="font-weight-bold">Nome</label>
+                    {{ form.nome }}
+                    {% if form.nome.errors %}
+                        <div class="text-danger small">{{ form.nome.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="font-weight-bold">CNPJ</label>
+                    {{ form.cnpj }}
+                    {% if form.cnpj.errors %}
+                        <div class="text-danger small">{{ form.cnpj.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="font-weight-bold">Email</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="text-danger small">{{ form.email.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="font-weight-bold">Telefone</label>
+                    {{ form.telefone }}
+                    {% if form.telefone.errors %}
+                        <div class="text-danger small">{{ form.telefone.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer text-right">
+            <button type="submit" class="btn btn-primary">
+                {% if modo == "criar" %}
+                    <i class="fa fa-save"></i> Salvar
+                {% else %}
+                    <i class="fa fa-check"></i> Atualizar
+                {% endif %}
+            </button>
+
+            <a href="{% url 'empresa_lista' %}" class="btn btn-secondary">
+                <i class="fa fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+
+    </form>
+</div>
+{% endblock %}

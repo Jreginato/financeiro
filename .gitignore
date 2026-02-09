@@ -1,0 +1,36 @@
+# .gitignore - Arquivos a NÃO enviar para GitHub
+
+# ANTES: Arquivo não existia
+# DEPOIS: Adicionado para não comitar arquivos desnecessários/privados
+
+# Python
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+
+# Django
+*.db
+db.sqlite3
+/staticfiles/
+/media/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ambiente
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db

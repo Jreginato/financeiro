@@ -1,0 +1,7 @@
+# Dependências do Projeto Financeiro
+
+# ANTES: (não tinha requirements.txt)
+# DEPOIS: Arquivo criado com dependências básicas
+
+Django==6.0.1
+django-jazzmin==3.0.1

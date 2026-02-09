@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% load form_filters %}
+
+{% block page_title %}
+    {% if modo == "criar" %}
+        Nova conta a pagar
+    {% else %}
+        Editar conta #{{ conta.id }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h3 class="card-title mb-0">
+            {% if modo == "criar" %}
+                <i class="fa fa-plus-circle"></i> Nova conta
+            {% else %}
+                <i class="fa fa-edit"></i> Editar conta
+            {% endif %}
+        </h3>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+        {% if form.errors %}
+            <div class="alert alert-warning">Existem erros no formulário. Verifique os campos marcados.</div>
+        {% endif %}
+
+        <!-- ABAS -->
+        <ul class="nav nav-tabs" id="formTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#geral">Geral</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#financeiro">Financeiro</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#recorrencia">Recorrência</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#obs">Observações</a>
+            </li>
+        </ul>
+
+        <div class="tab-content p-3">
+
+            <!-- ABA GERAL -->
+            <div class="tab-pane fade show active" id="geral">
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label class="font-weight-bold">Descrição</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-file-alt"></i></span>
+                            </div>
+                            {{ form.descricao|add_class:"form-control" }}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="font-weight-bold">Fornecedor</label>
+                        {{ form.fornecedor|add_class:"form-control select2" }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="font-weight-bold">Plano de contas</label>
+                        {{ form.plano_conta|add_class:"form-control select2" }}
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ABA FINANCEIRO -->
+            <div class="tab-pane fade" id="financeiro">
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold">Valor</label>
+                            {{ form.valor|add_class:"form-control money" }}
+                            {% if form.valor.errors %}
+                                <div class="text-danger small">{{ form.valor.errors }}</div>
+                            {% endif %}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold">Data de emissão</label>
+                        {{ form.data_emissao|add_class:"form-control date" }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold">Data de vencimento</label>
+                        {{ form.data_vencimento|add_class:"form-control date" }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold">Status</label>
+                        {{ form.status|add_class:"form-control" }}
+                    </div>
+
+                    {% if modo == "editar" %}
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold">Valor Pago</label>
+                        <input type="text" class="form-control" value="R$ {{ conta.valor_pago|default:'0,00' }}" readonly>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold">Data de Pagamento</label>
+                        <input type="date" class="form-control" value="{% if conta.data_pagamento %}{{ conta.data_pagamento|date:'Y-m-d' }}{% endif %}" readonly>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <!-- ABA RECORRÊNCIA -->
+            <div class="tab-pane fade" id="recorrencia">
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold">Recorrência</label>
+                        {{ form.recorrencia|add_class:"form-control" }}
+                    </div>
+
+                    <div class="col-md-4 mb-3" id="qtd_div">
+                        <label class="font-weight-bold">Quantidade de lançamentos</label>
+                        {{ form.quantidade_recorrencias|add_class:"form-control" }}
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ABA OBSERVAÇÕES -->
+            <div class="tab-pane fade" id="obs">
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label class="font-weight-bold">Observações</label>
+                        {{ form.observacoes|add_class:"form-control" }}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card-footer text-right">
+            <button type="submit" class="btn btn-primary">
+                {% if modo == "criar" %}
+                    <i class="fa fa-save"></i> Salvar
+                {% else %}
+                    <i class="fa fa-check"></i> Atualizar
+                {% endif %}
+            </button>
+
+            <a href="{% url 'contas_pagar_lista' %}" class="btn btn-secondary">
+                <i class="fa fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(function() {
+        $('.select2').select2({
+            width: '100%',
+            theme: 'classic'
+        });
+
+        // Inicializa date mask se plugin disponível
+        if ($.fn.mask) {
+            $('.date').mask('00/00/0000');
+
+            // custom formatting: insere vírgula automaticamente a partir de 3 dígitos
+            function formatIntegerWithThousands(s) {
+                return s.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
+
+            // Formata conforme solicitado:
+            // - se digitos < 3: mostra os dígitos (ex: 99 -> "99")
+            // - se digitos >= 3: últimos 2 são centavos (ex: 999 -> 9,99; 9999 -> 99,99; 999999 -> 9.999,99)
+            function formatMoneyField(el) {
+                var v = el.value || '';
+                var digits = v.replace(/\D/g, '');
+                if (digits.length === 0) { el.value = ''; return; }
+
+                if (digits.length < 3) {
+                    // mantém apenas os dígitos (não inserimos vírgula)
+                    el.value = digits;
+                    return;
+                }
+
+                var intPart = digits.slice(0, -2);
+                var dec = digits.slice(-2);
+                // remove zeros à esquerda do intPart
+                intPart = intPart.replace(/^0+(?=\d)/, '');
+                if (intPart === '') intPart = '0';
+                var formattedInt = formatIntegerWithThousands(intPart);
+                el.value = formattedInt + ',' + dec;
+            }
+
+            // inicializa campos atuais e liga o input handler com preservação de cursor
+            function setCaretPosition(el, pos) {
+                try { el.setSelectionRange(pos, pos); } catch (e) {}
+            }
+
+            function formatAndPreserveCaret(el) {
+                try {
+                    var old = el.value || '';
+                    var sel = (typeof el.selectionStart === 'number') ? el.selectionStart : 0;
+
+                    // conta quantos dígitos estavam antes do caret
+                    var digitsBeforeCaret = (old.slice(0, sel).match(/\d/g) || []).length;
+
+                    // obtém somente dígitos da string inteira
+                    var digits = (old.match(/\d/g) || []).join('');
+                    if (digits.length === 0) { el.value = ''; setCaretPosition(el, 0); return; }
+
+                    var newValue;
+                    if (digits.length < 3) {
+                        newValue = digits;
+                    } else {
+                        var intPart = digits.slice(0, -2);
+                        var dec = digits.slice(-2);
+                        // formata milhares
+                        var formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                        newValue = formattedInt + ',' + dec;
+                    }
+
+                    // calcula nova posição do caret com base em digitsBeforeCaret
+                    var pos = 0; // index in newValue
+                    var counted = 0;
+                    while (pos < newValue.length && counted < digitsBeforeCaret) {
+                        if (/\d/.test(newValue.charAt(pos))) counted++;
+                        pos++;
+                    }
+
+                    el.value = newValue;
+                    setCaretPosition(el, pos);
+                } catch (err) {
+                    console.error('formatMoney error', err);
+                }
+            }
+
+            $('.money').each(function() { formatAndPreserveCaret(this); });
+            $('.money').on('input', function() { formatAndPreserveCaret(this); });
+
+            // não convertemos no submit - mantemos o valor exibido com vírgula
+        }
+
+        function toggleRecorrencia() {
+            const recEl = document.getElementById("id_recorrencia");
+            const qtd = document.getElementById("qtd_div");
+            if (!recEl || !qtd) return;
+            const rec = recEl.value;
+
+            if (rec !== "nenhuma") {
+                qtd.style.display = "block";
+            } else {
+                qtd.style.display = "none";
+            }
+        }
+
+        const recEl = document.getElementById("id_recorrencia");
+        if (recEl) {
+            recEl.addEventListener("change", toggleRecorrencia);
+        }
+        toggleRecorrencia();
+    });
+</script>
+{% endblock %}

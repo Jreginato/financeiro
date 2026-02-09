@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Contas a receber{% endblock %}
+{% block page_title %}Contas a receber{% endblock %}
+
+{% block content %}
+
+<div class="mb-3 d-flex justify-content-between">
+    <div>
+        <a href="{% url 'conta_receber_criar' %}" class="btn btn-success">
+            <i class="fa fa-plus"></i> Nova conta
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Filtros</h3>
+    </div>
+
+    <div class="card-body">
+        <form method="get" class="row">
+            <div class="col-md-3">
+                <label>Status</label>
+                <select name="status" class="form-control">
+                    <option value="">-- Padrão (em aberto mês atual) --</option>
+                    <option value="todos"     {% if status == "todos" %}selected{% endif %}>Todos</option>
+                    <option value="pendente"  {% if status == "pendente" %}selected{% endif %}>Pendente</option>
+                    <option value="recebida"  {% if status == "recebida" %}selected{% endif %}>Recebida</option>
+                    <option value="atrasada"  {% if status == "atrasada" %}selected{% endif %}>Atrasada</option>
+                    <option value="cancelada" {% if status == "cancelada" %}selected{% endif %}>Cancelada</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label>Data início</label>
+                <input type="date" name="inicio" value="{{ data_inicio }}" class="form-control">
+            </div>
+
+            <div class="col-md-3">
+                <label>Data fim</label>
+                <input type="date" name="fim" value="{{ data_fim }}" class="form-control">
+            </div>
+
+            <div class="col-md-3 d-flex align-items-end">
+                <button class="btn btn-primary w-100">
+                    <i class="fa fa-filter"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- FORM ÚNICO PARA RECEBIMENTO EM LOTE -->
+<form method="POST" action="{% url 'contas_receber_recebimento_selecao' %}">
+    {% csrf_token %}
+
+    <div class="mt-3 mb-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="fa fa-money-bill"></i> Receber selecionadas
+        </button>
+    </div>
+
+    <div class="card mt-1">
+        <div class="card-header">
+            <h3 class="card-title">Listagem de contas</h3>
+        </div>
+
+        <div class="card-body table-responsive p-0">
+            <table class="table table-hover text-nowrap">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="checkAll"></th>
+                        <th>ID</th>
+                        <th>Descrição</th>
+                        <th>Cliente</th>
+                        <th>Valor</th>
+                        <th>Valor Recebido</th>
+                        <th>Status</th>
+                        <th>Vencimento</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for conta in contas %}
+                    <tr>
+                        <td>
+                            {% if conta.status == "pendente" or conta.status == "atrasada" %}
+                                <input type="checkbox" name="contas" value="{{ conta.id }}">
+                            {% endif %}
+                        </td>
+
+                        <td>{{ conta.id }}</td>
+                        <td>{{ conta.descricao }}</td>
+                        <td>{{ conta.cliente }}</td>
+                        <td>R$ {{ conta.valor }}</td>
+                        <td>R$ {{ conta.valor_recebido|default:"0,00" }}</td>
+                        <td>{{ conta.get_status_display }}</td>
+                        <td>{{ conta.data_vencimento|date:"d/m/Y" }}</td>
+
+                        <td class="text-right">
+                            <a href="{% url 'conta_receber_editar' conta.id %}" class="btn btn-sm btn-primary">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                            <a href="{% url 'conta_receber_excluir' conta.id %}" class="btn btn-sm btn-danger">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center p-4">
+                            Nenhuma conta encontrada.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+</form>
+
+<script>
+document.getElementById("checkAll").addEventListener("change", function() {
+    const checks = document.querySelectorAll("input[name='contas']");
+    checks.forEach(c => c.checked = this.checked);
+});
+</script>
+
+{% endblock %}
