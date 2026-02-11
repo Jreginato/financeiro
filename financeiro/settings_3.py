@@ -60,7 +60,8 @@ INSTALLED_APPS = [
         "login",
         "contas_pagar",
         "contas_receber",
-        "empresa"
+        "empresa",
+        "investimento"
 ]
 
 MIDDLEWARE = [

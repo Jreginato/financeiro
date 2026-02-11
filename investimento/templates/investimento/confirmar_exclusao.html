@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block page_title %}Confirmar exclusão{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-danger text-white">
+        <h3 class="card-title mb-0">
+            <i class="fa fa-trash"></i> Confirmar exclusão
+        </h3>
+    </div>
+
+    <div class="card-body">
+        <p class="lead">Tem certeza que deseja excluir este investimento?</p>
+        
+        <div class="alert alert-warning">
+            <strong>Atenção:</strong> Esta ação não pode ser desfeita!
+        </div>
+
+        <table class="table table-bordered">
+            <tr>
+                <th width="30%">ID:</th>
+                <td>{{ investimento.id }}</td>
+            </tr>
+            <tr>
+                <th>Ticker:</th>
+                <td><strong>{{ investimento.ticker }}</strong></td>
+            </tr>
+            <tr>
+                <th>Nome:</th>
+                <td>{{ investimento.nome_ativo }}</td>
+            </tr>
+            <tr>
+                <th>Tipo de Ativo:</th>
+                <td>{{ investimento.get_tipo_ativo_display }}</td>
+            </tr>
+            <tr>
+                <th>Tipo de Operação:</th>
+                <td>{{ investimento.get_tipo_operacao_display }}</td>
+            </tr>
+            <tr>
+                <th>Data da Operação:</th>
+                <td>{{ investimento.data_operacao|date:"d/m/Y" }}</td>
+            </tr>
+            <tr>
+                <th>Quantidade:</th>
+                <td>{{ investimento.quantidade }}</td>
+            </tr>
+            <tr>
+                <th>Valor Total:</th>
+                <td><strong>R$ {{ investimento.valor_total }}</strong></td>
+            </tr>
+            <tr>
+                <th>Empresa:</th>
+                <td>{{ investimento.empresa }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="card-footer text-right">
+        <form method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                <i class="fa fa-trash"></i> Sim, excluir
+            </button>
+        </form>
+
+        <a href="{% url 'investimento_lista' %}" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> Cancelar
+        </a>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+{% load form_filters %}
+
+{% block page_title %}
+    {% if modo == "criar" %}
+        Novo investimento
+    {% else %}
+        Editar investimento #{{ investimento.id }}
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media (max-width: 768px) {
+        .flatpickr-calendar {
+            font-size: 16px !important;
+        }
+        .flatpickr-day {
+            height: 42px !important;
+            line-height: 42px !important;
+            max-width: 42px !important;
+        }
+        .calendar-btn {
+            padding: 0.75rem 1rem;
+        }
+    }
+    
+    .calendar-btn {
+        border-left: 0;
+    }
+    
+    .date-picker {
+        border-right: 0 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h3 class="card-title mb-0">
+            {% if modo == "criar" %}
+                <i class="fa fa-plus-circle"></i> Novo investimento
+            {% else %}
+                <i class="fa fa-edit"></i> Editar investimento
+            {% endif %}
+        </h3>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger m-3">
+                <strong><i class="fa fa-exclamation-triangle"></i> Erro:</strong>
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+        
+        {% if form.errors %}
+            <div class="alert alert-warning m-3">
+                <strong><i class="fa fa-exclamation-circle"></i> Atenção:</strong>
+                Existem erros no formulário. Verifique os campos marcados em vermelho abaixo.
+            </div>
+        {% endif %}
+
+        <!-- ABAS -->
+        <ul class="nav nav-tabs" id="formTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#geral">Geral</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#operacao">Operação</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#custos">Custos e Taxas</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#adicional">Informações Adicionais</a>
+            </li>
+        </ul>
+
+        <div class="tab-content p-3">
+
+            <!-- ABA GERAL -->
+            <div class="tab-pane fade show active" id="geral">
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label class="font-weight-bold">Empresa <span class="text-danger">*</span></label>
+                        {{ form.empresa|add_class:"form-control select2" }}
+                        {% if form.empresa.errors %}
+                            <div class="text-danger small mt-1">
+                                <i class="fa fa-exclamation-circle"></i> {{ form.empresa.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="font-weight-bold">Tipo de Ativo <span class="text-danger">*</span></label>
+                        {{ form.tipo_ativo|add_class:"form-control" }}
+                        {% if form.tipo_ativo.errors %}
+                            <div class="text-danger small mt-1">
+                                <i class="fa fa-exclamation-circle"></i> {{ form.tipo_ativo.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="font-weight-bold">Tipo de Operação <span class="text-danger">*</span></label>
+                        {{ form.tipo_operacao|add_class:"form-control" }}
+                        {% if form.tipo_operacao.errors %}
+                            <div class="text-danger small mt-1">
+                                <i class="fa fa-exclamation-circle"></i> {{ form.tipo_operacao.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold">Ticker/Código <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-chart-line"></i></span>
+                            </div>
+                            {{ form.ticker|add_class:"form-control text-uppercase" }}
+                        </div>
+                        {% if form.ticker.errors %}
+                            <div class="text-danger small mt-1">
+                                <i class="fa fa-exclamation-circle"></i> {{ form.ticker.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-8 mb-3">
+                        <label class="font-weight-bold">Nome do Ativo</label>
+                        {{ form.nome_ativo|add_class:"form-control" }}
+                        {% if form.nome_ativo.errors %}
+                            <div class="text-danger small mt-1">
+                                <i class="fa fa-exclamation-circle"></i> {{ form.nome_ativo.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ABA OPERAÇÃO -->
+            <div class="tab-pane fade" id="operacao">
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+                        <label class="font-weight-bold">Data da Operação <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            {{ form.data_operacao|add_class:"form-control date-picker" }}
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary calendar-btn" type="button" data-target="#id_data_operacao">
+                                    <i class="fa fa-calendar"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% if form.data_operacao.errors %}
+                            <div class="text-danger small mt-1">
+                                <i class="fa fa-exclamation-circle"></i> {{ form.data_operacao.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="font-weight-bold">Quantidade <span class="text-danger">*</span></label>
+                        {{ form.quantidade|add_class:"form-control money" }}
+                        {% if form.quantidade.errors %}
+                            <div class="text-danger small mt-1">
+                                <i class="fa fa-exclamation-circle"></i> {{ form.quantidade.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="font-weight-bold">Preço Unitário <span class="text-danger">*</span></label>
+                        {{ form.preco_unitario|add_class:"form-control money" }}
+                        {% if form.preco_unitario.errors %}
+                            <div class="text-danger small mt-1">
+                                <i class="fa fa-exclamation-circle"></i> {{ form.preco_unitario.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="font-weight-bold">Valor Total <span class="text-danger">*</span></label>
+                        {{ form.valor_total|add_class:"form-control money" }}
+                        {% if form.valor_total.errors %}
+                            <div class="text-danger small mt-1">
+                                <i class="fa fa-exclamation-circle"></i> {{ form.valor_total.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ABA CUSTOS E TAXAS -->
+            <div class="tab-pane fade" id="custos">
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold">Taxa de Corretagem</label>
+                        {{ form.taxa_corretagem|add_class:"form-control money" }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold">Taxa de Custódia</label>
+                        {{ form.taxa_custodia|add_class:"form-control money" }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold">Emolumentos</label>
+                        {{ form.emolumentos|add_class:"form-control money" }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold">Impostos</label>
+                        {{ form.impostos|add_class:"form-control money" }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold">Outras Taxas</label>
+                        {{ form.outras_taxas|add_class:"form-control money" }}
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ABA INFORMAÇÕES ADICIONAIS -->
+            <div class="tab-pane fade" id="adicional">
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label class="font-weight-bold">Data de Vencimento</label>
+                        <div class="input-group">
+                            {{ form.data_vencimento|add_class:"form-control date-picker" }}
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary calendar-btn" type="button" data-target="#id_data_vencimento">
+                                    <i class="fa fa-calendar"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <small class="text-muted">Para ativos de renda fixa</small>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="font-weight-bold">Rentabilidade Contratada</label>
+                        {{ form.rentabilidade_contratada|add_class:"form-control" }}
+                        <small class="text-muted">Ex: 100% CDI, IPCA + 6%, 12% a.a.</small>
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label class="font-weight-bold">Observações</label>
+                        {{ form.observacoes|add_class:"form-control" }}
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card-footer text-right">
+            <button type="submit" class="btn btn-success">
+                {% if modo == "criar" %}
+                    <i class="fa fa-save"></i> Salvar
+                {% else %}
+                    <i class="fa fa-check"></i> Atualizar
+                {% endif %}
+            </button>
+
+            <a href="{% url 'investimento_lista' %}" class="btn btn-secondary">
+                <i class="fa fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(function() {
+        $('.select2').select2({
+            width: '100%',
+            theme: 'classic'
+        });
+
+        // Inicializa Flatpickr para campos de data
+        $('.date-picker').each(function() {
+            flatpickr(this, {
+                locale: 'pt',
+                dateFormat: 'd/m/Y',
+                altInput: false,
+                allowInput: true,
+                clickOpens: true,
+                mobileNative: false,
+                defaultDate: new Date(), // Data de hoje como padrão
+                onReady: function(selectedDates, dateStr, instance) {
+                    if (window.matchMedia('(max-width: 768px)').matches) {
+                        instance.input.setAttribute('inputmode', 'numeric');
+                        instance.input.setAttribute('pattern', '[0-9/]*');
+                    }
+                }
+            });
+        });
+
+        // Botões de calendário abrem o picker
+        $('.calendar-btn').on('click', function() {
+            var targetId = $(this).data('target');
+            var input = $(targetId)[0];
+            if (input && input._flatpickr) {
+                input._flatpickr.open();
+            }
+        });
+
+        // Máscara de moeda
+        if ($.fn.mask) {
+            function formatIntegerWithThousands(s) {
+                return s.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
+
+            function setCaretPosition(el, pos) {
+                try { el.setSelectionRange(pos, pos); } catch (e) {}
+            }
+
+            function formatAndPreserveCaret(el) {
+                try {
+                    var old = el.value || '';
+                    var sel = (typeof el.selectionStart === 'number') ? el.selectionStart : 0;
+                    var digitsBeforeCaret = (old.slice(0, sel).match(/\d/g) || []).length;
+                    var digits = (old.match(/\d/g) || []).join('');
+                    
+                    if (digits.length === 0) { 
+                        el.value = ''; 
+                        setCaretPosition(el, 0); 
+                        return; 
+                    }
+
+                    var newValue;
+                    if (digits.length < 3) {
+                        newValue = digits;
+                    } else {
+                        var intPart = digits.slice(0, -2);
+                        var dec = digits.slice(-2);
+                        var formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                        newValue = formattedInt + ',' + dec;
+                    }
+
+                    var pos = 0;
+                    var counted = 0;
+                    while (pos < newValue.length && counted < digitsBeforeCaret) {
+                        if (/\d/.test(newValue.charAt(pos))) counted++;
+                        pos++;
+                    }
+
+                    el.value = newValue;
+                    setCaretPosition(el, pos);
+                } catch (err) {
+                    console.error('formatMoney error', err);
+                }
+            }
+
+            $('.money').each(function() { formatAndPreserveCaret(this); });
+            $('.money').on('input', function() { formatAndPreserveCaret(this); });
+        }
+
+        // Converter ticker para maiúsculas
+        $('input.text-uppercase').on('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    });
+</script>
+{% endblock %}

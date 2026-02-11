@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Investimentos{% endblock %}
+{% block page_title %}Investimentos{% endblock %}
+
+{% block content %}
+
+<div class="mb-3 d-flex justify-content-between">
+    <div>
+        <a href="{% url 'investimento_criar' %}" class="btn btn-success">
+            <i class="fa fa-plus"></i> Novo investimento
+        </a>
+        <a href="{% url 'investimento_insights' %}" class="btn btn-info">
+            <i class="fa fa-chart-pie"></i> Insights Estratégicos
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Filtros</h3>
+    </div>
+
+    <div class="card-body">
+        <form method="get" class="row">
+            <div class="col-md-3">
+                <label>Tipo de Ativo</label>
+                <select name="tipo_ativo" class="form-control">
+                    <option value="">Todos</option>
+                    <option value="acoes" {% if tipo_ativo == "acoes" %}selected{% endif %}>Ações</option>
+                    <option value="criptomoeda" {% if tipo_ativo == "criptomoeda" %}selected{% endif %}>Criptomoeda</option>
+                    <option value="fii" {% if tipo_ativo == "fii" %}selected{% endif %}>Fundo Imobiliário</option>
+                    <option value="renda_fixa" {% if tipo_ativo == "renda_fixa" %}selected{% endif %}>Renda Fixa</option>
+                    <option value="cdb" {% if tipo_ativo == "cdb" %}selected{% endif %}>CDB</option>
+                    <option value="lci" {% if tipo_ativo == "lci" %}selected{% endif %}>LCI</option>
+                    <option value="lca" {% if tipo_ativo == "lca" %}selected{% endif %}>LCA</option>
+                    <option value="tesouro_direto" {% if tipo_ativo == "tesouro_direto" %}selected{% endif %}>Tesouro Direto</option>
+                    <option value="debentures" {% if tipo_ativo == "debentures" %}selected{% endif %}>Debêntures</option>
+                    <option value="etf" {% if tipo_ativo == "etf" %}selected{% endif %}>ETF</option>
+                    <option value="outros" {% if tipo_ativo == "outros" %}selected{% endif %}>Outros</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label>Tipo de Operação</label>
+                <select name="tipo_operacao" class="form-control">
+                    <option value="">Todos</option>
+                    <option value="compra" {% if tipo_operacao == "compra" %}selected{% endif %}>Compra</option>
+                    <option value="venda" {% if tipo_operacao == "venda" %}selected{% endif %}>Venda</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label>Data início</label>
+                <input type="date" name="inicio" value="{{ data_inicio }}" class="form-control">
+            </div>
+
+            <div class="col-md-3">
+                <label>Data fim</label>
+                <input type="date" name="fim" value="{{ data_fim }}" class="form-control">
+            </div>
+
+            <div class="col-md-1 d-flex align-items-end">
+                <button class="btn btn-primary w-100">
+                    <i class="fa fa-filter"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title">Listagem de investimentos</h3>
+    </div>
+
+    <div class="card-body table-responsive p-0">
+        <table class="table table-hover text-nowrap">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Data</th>
+                    <th>Tipo Op.</th>
+                    <th>Tipo Ativo</th>
+                    <th>Ticker</th>
+                    <th>Nome</th>
+                    <th>Quantidade</th>
+                    <th>Preço Unitário</th>
+                    <th>Valor Total</th>
+                    <th>Empresa</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for inv in investimentos %}
+                <tr>
+                    <td>{{ inv.id }}</td>
+                    <td>{{ inv.data_operacao|date:"d/m/Y" }}</td>
+                    <td>
+                        {% if inv.tipo_operacao == "compra" %}
+                            <span class="badge badge-success">{{ inv.get_tipo_operacao_display }}</span>
+                        {% else %}
+                            <span class="badge badge-danger">{{ inv.get_tipo_operacao_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ inv.get_tipo_ativo_display }}</td>
+                    <td><strong>{{ inv.ticker }}</strong></td>
+                    <td>{{ inv.nome_ativo|default:"-" }}</td>
+                    <td>{{ inv.quantidade }}</td>
+                    <td>R$ {{ inv.preco_unitario }}</td>
+                    <td><strong>R$ {{ inv.valor_total }}</strong></td>
+                    <td>
+                        {{ inv.empresa
+                        <a href="{% url 'investimento_editar' inv.id %}" class="btn btn-sm btn-info" title="Editar">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                        <a href="{% url 'investimento_excluir' inv.id %}" class="btn btn-sm btn-danger" title="Excluir">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="12" class="text-center">
+                        <em>Nenhum investimento encontrado</em>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}1

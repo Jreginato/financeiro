@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Insights Estratégicos - Investimentos{% endblock %}
+{% block page_title %}Insights Estratégicos - Investimentos{% endblock %}
+
+{% block extra_css %}
+<style>
+    .insight-card {
+        transition: transform 0.2s;
+    }
+    .insight-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .metric-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+    }
+    .metric-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        text-transform: uppercase;
+    }
+    .positive {
+        color: #28a745;
+    }
+    .negative {
+        color: #dc3545;
+    }
+    .neutral {
+        color: #6c757d;
+    }
+    .progress-custom {
+        height: 25px;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-3">
+    <a href="{% url 'investimento_lista' %}" class="btn btn-secondary">
+        <i class="fa fa-arrow-left"></i> Voltar para listagem
+    </a>
+</div>
+
+<!-- RESUMO GERAL -->
+<div class="row">
+    <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+        <div class="card insight-card bg-primary text-white">
+            <div class="card-body">
+                <div class="metric-label">Total Investido</div>
+                <div class="metric-value">R$ {{ insights.resumo.total_investido|floatformat:2 }}</div>
+                <small><i class="fa fa-shopping-cart"></i> {{ insights.resumo.total_compras }} compras</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+        <div class="card insight-card bg-info text-white">
+            <div class="card-body">
+                <div class="metric-label">Total Resgatado</div>
+                <div class="metric-value">R$ {{ insights.resumo.total_resgatado|floatformat:2 }}</div>
+                <small><i class="fa fa-money-bill-wave"></i> {{ insights.resumo.total_vendas }} vendas</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+        <div class="card insight-card bg-success text-white">
+            <div class="card-body">
+                <div class="metric-label">Saldo Atual</div>
+                <div class="metric-value">R$ {{ insights.resumo.saldo_atual|floatformat:2 }}</div>
+                <small><i class="fa fa-wallet"></i> Investido - Resgatado</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TAXAS E CUSTOS -->
+<div class="row">
+    <div class="col-md-12 mb-3">
+        <div class="card">
+            <div class="card-header bg-warning">
+                <h3 class="card-title"><i class="fa fa-receipt"></i> Total em Taxas e Custos</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 text-center">
+                        <h4 class="text-warning">R$ {{ insights.resumo.total_taxas|floatformat:2 }}</h4>
+                        <small class="text-muted">TOTAL GERAL</small>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <h5>R$ {{ insights.detalhes_taxas.corretagem|default:"0.00"|floatformat:2 }}</h5>
+                        <small class="text-muted">Corretagem</small>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <h5>R$ {{ insights.detalhes_taxas.custodia|default:"0.00"|floatformat:2 }}</h5>
+                        <small class="text-muted">Custódia</small>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <h5>R$ {{ insights.detalhes_taxas.emolumentos|default:"0.00"|floatformat:2 }}</h5>
+                        <small class="text-muted">Emolumentos</small>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <h5>R$ {{ insights.detalhes_taxas.impostos|default:"0.00"|floatformat:2 }}</h5>
+                        <small class="text-muted">Impostos</small>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <h5>R$ {{ insights.detalhes_taxas.outras|default:"0.00"|floatformat:2 }}</h5>
+                        <small class="text-muted">Outras</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DISTRIBUIÇÃO POR TIPO DE ATIVO -->
+{% if insights.por_tipo_ativo %}
+<div class="row">
+    <div class="col-md-12 mb-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title"><i class="fa fa-chart-pie"></i> Distribuição por Tipo de Ativo</h3>
+            </div>
+            <div class="card-body">
+                {% for tipo in insights.por_tipo_ativo %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span><strong>{{ tipo.tipo }}</strong></span>
+                        <span class="text-muted">{{ tipo.qtd_operacoes }} operações</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <small class="text-success">Compras: R$ {{ tipo.total_compras|floatformat:2 }}</small>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-danger">Vendas: R$ {{ tipo.total_vendas|floatformat:2 }}</small>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-primary"><strong>Saldo: R$ {{ tipo.saldo|floatformat:2 }}</strong></small>
+                        </div>
+                    </div>
+                    <div class="progress progress-custom mt-2">
+                        {% widthratio tipo.saldo insights.resumo.saldo_atual 100 as percentual %}
+                        <div class="progress-bar bg-primary" role="progressbar" 
+                             style="width: {{ percentual }}%">
+                            {{ percentual }}%
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
