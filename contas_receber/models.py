@@ -15,10 +15,10 @@ class ContaReceber(models.Model):
 
     cliente = models.ForeignKey(
         emp.Empresa,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
+        on_delete=models.PROTECT,
         related_name="contas_receber",
+        null=True,
+        blank=False,
     )
 
     valor = models.DecimalField(max_digits=10, decimal_places=2)

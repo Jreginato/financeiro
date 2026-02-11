@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+    Criar Recorrências
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h3 class="card-title mb-0">
+            <i class="fa fa-redo"></i> Criar Lançamentos Recorrentes
+        </h3>
+    </div>
+
+    <div class="card-body">
+        <div class="alert alert-info">
+            <i class="fa fa-info-circle"></i> 
+            <strong>Conta Original:</strong><br>
+            <strong>Descrição:</strong> {{ conta.descricao }}<br>
+            <strong>Valor:</strong> R$ {{ conta.valor }}<br>
+            <strong>Vencimento:</strong> {{ conta.data_vencimento|date:"d/m/Y" }}<br>
+            <strong>Fornecedor:</strong> {{ conta.fornecedor }}
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="font-weight-bold">Quantos lançamentos deseja criar?</label>
+                <input type="number" 
+                       name="quantidade" 
+                       class="form-control" 
+                       min="1" 
+                       max="120" 
+                       value="12" 
+                       required
+                       placeholder="Ex: 12 para criar 12 parcelas mensais">
+                <small class="form-text text-muted">
+                    Os lançamentos serão criados mensalmente, mantendo o mesmo dia de vencimento.
+                </small>
+            </div>
+
+            <div class="card-footer text-right bg-white px-0">
+                <button type="submit" class="btn btn-success">
+                    <i class="fa fa-arrow-right"></i> Continuar
+                </button>
+
+                <a href="{% url 'conta_pagar_editar' conta.id %}" class="btn btn-secondary">
+                    <i class="fa fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

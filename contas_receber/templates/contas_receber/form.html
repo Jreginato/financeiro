@@ -9,6 +9,33 @@
     {% endif %}
 {% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Otimizações para mobile */
+    @media (max-width: 768px) {
+        .flatpickr-calendar {
+            font-size: 16px !important;
+        }
+        .flatpickr-day {
+            height: 42px !important;
+            line-height: 42px !important;
+            max-width: 42px !important;
+        }
+        .calendar-btn {
+            padding: 0.75rem 1rem;
+        }
+    }
+    
+    .calendar-btn {
+        border-left: 0;
+    }
+    
+    .date-picker {
+        border-right: 0 !important;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 
 <div class="card shadow-sm">
@@ -82,12 +109,26 @@
 
                     <div class="col-md-4 mb-3">
                         <label class="font-weight-bold">Data de emissão</label>
-                        {{ form.data_emissao|add_class:"form-control date" }}
+                        <div class="input-group">
+                            {{ form.data_emissao|add_class:"form-control date-picker" }}
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary calendar-btn" type="button" data-target="#id_data_emissao">
+                                    <i class="fa fa-calendar"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="col-md-4 mb-3">
                         <label class="font-weight-bold">Data de vencimento</label>
-                        {{ form.data_vencimento|add_class:"form-control date" }}
+                        <div class="input-group">
+                            {{ form.data_vencimento|add_class:"form-control date-picker" }}
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary calendar-btn" type="button" data-target="#id_data_vencimento">
+                                    <i class="fa fa-calendar"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="col-md-4 mb-3">
@@ -148,9 +189,36 @@
             theme: 'classic'
         });
 
+        // Inicializa Flatpickr para campos de data (otimizado para mobile)
+        $('.date-picker').each(function() {
+            flatpickr(this, {
+                locale: 'pt',
+                dateFormat: 'd/m/Y',
+                altInput: false,
+                allowInput: true,
+                clickOpens: true,
+                mobileNative: false, // Usa o picker do flatpickr mesmo no mobile
+                onReady: function(selectedDates, dateStr, instance) {
+                    // No mobile, garante que o teclado numérico seja usado
+                    if (window.matchMedia('(max-width: 768px)').matches) {
+                        instance.input.setAttribute('inputmode', 'numeric');
+                        instance.input.setAttribute('pattern', '[0-9/]*');
+                    }
+                }
+            });
+        });
+
+        // Botões de calendário abrem o picker
+        $('.calendar-btn').on('click', function() {
+            var targetId = $(this).data('target');
+            var input = $(targetId)[0];
+            if (input && input._flatpickr) {
+                input._flatpickr.open();
+            }
+        });
+
         // Inicializa date mask se plugin disponível
         if ($.fn.mask) {
-            $('.date').mask('00/00/0000');
 
             // custom formatting: insere vírgula automaticamente a partir de 3 dígitos
             function formatIntegerWithThousands(s) {

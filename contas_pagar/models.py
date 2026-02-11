@@ -65,10 +65,10 @@ class ContaPagar(models.Model):
 
     fornecedor = models.ForeignKey(
         emp.Empresa,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
+        on_delete=models.PROTECT,
         related_name="contas_pagar",
+        null=True,
+        blank=False,
     )
 
     plano_conta = models.ForeignKey(

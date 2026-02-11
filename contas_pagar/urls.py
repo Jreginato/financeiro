@@ -19,4 +19,9 @@ urlpatterns = [
     # Cópia de Contas
     path("copia/", views.copia_selecao, name="contas_pagar_copia_selecao"),
     path("copia/confirmar/", views.copia_confirmar, name="contas_pagar_copia_confirmar"),
+
+    # Recorrência de Contas
+    path("<int:pk>/recorrencia/", views.recorrencia_quantidade, name="contas_pagar_recorrencia"),
+    path("<int:pk>/recorrencia/previa/", views.recorrencia_previa, name="contas_pagar_recorrencia_previa"),
+    path("recorrencia/confirmar/", views.recorrencia_confirmar, name="contas_pagar_recorrencia_confirmar"),
 ]

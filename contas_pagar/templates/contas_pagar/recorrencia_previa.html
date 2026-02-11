@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+    Prévia de Recorrências
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Otimizações para mobile */
+    @media (max-width: 768px) {
+        .flatpickr-calendar {
+            font-size: 16px !important;
+        }
+        .flatpickr-day {
+            height: 42px !important;
+            line-height: 42px !important;
+            max-width: 42px !important;
+        }
+        .calendar-btn-recorrencia {
+            padding: 0.75rem 1rem;
+        }
+        .table {
+            font-size: 0.85rem;
+        }
+    }
+    
+    .calendar-btn-recorrencia {
+        border-left: 0;
+    }
+    
+    .date-picker-recorrencia {
+        border-right: 0 !important;
+    }
+    
+    .badge-primary {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.6rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h3 class="card-title mb-0">
+            <i class="fa fa-redo"></i> Prévia dos Lançamentos Recorrentes
+        </h3>
+    </div>
+
+    <div class="alert alert-info m-3">
+        <i class="fa fa-info-circle"></i> 
+        <strong>Conta Base:</strong> {{ conta.descricao }} - R$ {{ conta.valor }} - Vencimento: {{ conta.data_vencimento|date:"d/m/Y" }}
+        <br>
+        <strong>Total de lançamentos a criar:</strong> {{ quantidade }}
+    </div>
+
+    <form method="POST" action="{% url 'contas_pagar_recorrencia_confirmar' %}">
+        {% csrf_token %}
+        <input type="hidden" name="conta_id" value="{{ conta.id }}">
+        <input type="hidden" name="quantidade" value="{{ quantidade }}">
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped mt-3">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">#</th>
+                        <th style="width: 35%;">Descrição</th>
+                        <th style="width: 20%;">Valor</th>
+                        <th style="width: 40%;">Data de Vencimento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lancamento in lancamentos %}
+                    <tr>
+                        <td class="text-center">
+                            <span class="badge badge-primary">{{ lancamento.numero }}</span>
+                        </td>
+                        <td>
+                            <input type="text"
+                                   name="descricao_{{ lancamento.numero }}"
+                                   class="form-control"
+                                   value="{{ lancamento.descricao }}">
+                        </td>
+                        <td>
+                            <input type="text"
+                                   name="valor_{{ lancamento.numero }}"
+                                   class="form-control money"
+                                   value="{{ lancamento.valor }}">
+                        </td>
+                        <td>
+                            <div class="input-group">
+                                <input type="text"
+                                       id="data_vencimento_{{ lancamento.numero }}"
+                                       name="data_vencimento_{{ lancamento.numero }}"
+                                       class="form-control date-picker-recorrencia"
+                                       value="{{ lancamento.data_vencimento|date:'d/m/Y' }}">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary calendar-btn-recorrencia" 
+                                            type="button" 
+                                            data-target="#data_vencimento_{{ lancamento.numero }}">
+                                        <i class="fa fa-calendar"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer text-right">
+            <button type="submit" class="btn btn-success btn-lg">
+                <i class="fa fa-check"></i> Confirmar e Criar {{ quantidade }} Lançamento{{ quantidade|pluralize }}
+            </button>
+
+            <a href="{% url 'contas_pagar_lista' %}" class="btn btn-secondary">
+                <i class="fa fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script>
+$(function() {
+    $('.money').mask('000.000.000,00', {reverse: true});
+
+    // Inicializa Flatpickr para campos de data na recorrência
+    $('.date-picker-recorrencia').each(function() {
+        flatpickr(this, {
+            locale: 'pt',
+            dateFormat: 'd/m/Y',
+            altInput: false,
+            allowInput: true,
+            clickOpens: true,
+            onReady: function(selectedDates, dateStr, instance) {
+                if (window.matchMedia('(max-width: 768px)').matches) {
+                    instance.input.setAttribute('inputmode', 'numeric');
+                    instance.input.setAttribute('pattern', '[0-9/]*');
+                }
+            }
+        });
+    });
+
+    // Botões de calendário abrem o picker
+    $('.calendar-btn-recorrencia').on('click', function() {
+        var targetId = $(this).data('target');
+        var input = $(targetId)[0];
+        if (input && input._flatpickr) {
+            input._flatpickr.open();
+        }
+    });
+});
+</script>
+
+{% endblock %}

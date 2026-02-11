@@ -59,9 +59,12 @@ class PagamentoService:
             if valor <= 0:
                 continue
 
+            # Converte data do formato brasileiro (dd/mm/yyyy) para date
+            data_convertida = datetime.strptime(data, "%d/%m/%Y").date()
+
             PagamentoService.copiar_conta(
                 conta,
                 descricao=descricao,
                 valor=valor,
-                data_vencimento=datetime.strptime(data, "%Y-%m-%d").date()
+                data_vencimento=data_convertida
             )

@@ -1,6 +1,41 @@
 
 {% extends "base.html" %}
 
+{% block extra_css %}
+<style>
+    /* Otimizações para mobile */
+    @media (max-width: 768px) {
+        .flatpickr-calendar {
+            font-size: 16px !important;
+        }
+        .flatpickr-day {
+            height: 42px !important;
+            line-height: 42px !important;
+            max-width: 42px !important;
+        }
+        .calendar-btn-copia {
+            padding: 0.75rem 1rem;
+        }
+        .table {
+            font-size: 0.85rem;
+        }
+    }
+    
+    .calendar-btn-copia {
+        border-left: 0;
+    }
+    
+    .date-picker-copia {
+        border-right: 0 !important;
+    }
+    
+    .badge-info {
+        font-size: 0.95rem;
+        padding: 0.5rem 0.75rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 
 <div class="card shadow-sm">
@@ -19,34 +54,45 @@
                     <th>Descrição</th>
                     <th>Fornecedor</th>
                     <th>Valor da Cópia</th>
-                    <th>Data de Vencimento</th>
+                    <th>Vencimento Original</th>
+                    <th>Nova Data de Vencimento</th>
                 </tr>
             </thead>
             <tbody>
-                {% for conta in contas %}
+                {% for item in contas_com_datas %}
                 <tr>
                     <td>
                         <input type="text"
-                               name="descricao_{{ conta.id }}"
+                               name="descricao_{{ item.conta.id }}"
                                class="form-control"
-                               value="{{ conta.descricao }}">
+                               value="{{ item.conta.descricao }}">
                     </td>
-                    <td>{{ conta.fornecedor }}</td>
+                    <td>{{ item.conta.fornecedor }}</td>
                     <td>
                         <input type="text"
-                               name="valor_{{ conta.id }}"
+                               name="valor_{{ item.conta.id }}"
                                class="form-control money"
-                               value="{{ conta.valor }}">
+                               value="{{ item.conta.valor }}">
                     </td>
-
+                    <td class="text-center">
+                        <span class="badge badge-info">{{ item.conta.data_vencimento|date:"d/m/Y" }}</span>
+                    </td>
                     <td>
-                        <input type="date"
-                               name="data_vencimento_{{ conta.id }}"
-                               class="form-control"
-                               value="{{ hoje }}">
+                        <div class="input-group">
+                            <input type="text"
+                                   id="data_vencimento_{{ item.conta.id }}"
+                                   name="data_vencimento_{{ item.conta.id }}"
+                                   class="form-control date-picker-copia"
+                                   value="{{ item.nova_data_vencimento|date:'d/m/Y' }}">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary calendar-btn-copia" type="button" data-target="#data_vencimento_{{ item.conta.id }}">
+                                    <i class="fa fa-calendar"></i>
+                                </button>
+                            </div>
+                        </div>
                     </td>
 
-                    <input type="hidden" name="contas" value="{{ conta.id }}">
+                    <input type="hidden" name="contas" value="{{ item.conta.id }}">
                 </tr>
                 {% endfor %}
             </tbody>
@@ -66,7 +112,35 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 <script>
-$('.money').mask('000.000.000,00', {reverse: true});
+$(function() {
+    $('.money').mask('000.000.000,00', {reverse: true});
+
+    // Inicializa Flatpickr para campos de data na cópia
+    $('.date-picker-copia').each(function() {
+        flatpickr(this, {
+            locale: 'pt',
+            dateFormat: 'd/m/Y',
+            altInput: false,
+            allowInput: true,
+            clickOpens: true,
+            onReady: function(selectedDates, dateStr, instance) {
+                if (window.matchMedia('(max-width: 768px)').matches) {
+                    instance.input.setAttribute('inputmode', 'numeric');
+                    instance.input.setAttribute('pattern', '[0-9/]*');
+                }
+            }
+        });
+    });
+
+    // Botões de calendário abrem o picker
+    $('.calendar-btn-copia').on('click', function() {
+        var targetId = $(this).data('target');
+        var input = $(targetId)[0];
+        if (input && input._flatpickr) {
+            input._flatpickr.open();
+        }
+    });
+});
 </script>
 
 {% endblock %}

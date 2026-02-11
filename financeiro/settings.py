@@ -20,25 +20,27 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
+ENVIRONMENT = os.environ.get('DJANGO_ENV', 'local').lower()
+IS_PRODUCTION = ENVIRONMENT in {'prod', 'production'}
+
 # SECURITY WARNING: keep the secret key used in production secret!
-# ANTES: SECRET_KEY = 'django-insecure-c&xg5cyk9k($p04+ay7=ho#cq2knt5-n#trswxhc91ajhtum6)'
-# DEPOIS: Usando variável de ambiente ou fallback para desenvolvimento
+# Local dev uses a fallback key. For production/PythonAnywhere:
+# - set DJANGO_ENV=production
+# - set DJANGO_SECRET_KEY with a strong value
 SECRET_KEY = os.environ.get(
-    'DJANGO_SECRET_KEY', 
+    'DJANGO_SECRET_KEY',
     'django-insecure-c&xg5cyk9k($p04+ay7=ho#cq2knt5-n#trswxhc91ajhtum6)'
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# ANTES: DEBUG = True
-# DEPOIS: Usando variável de ambiente (em produção: DEBUG=False)
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+# Local dev defaults to DEBUG=True. For production/PythonAnywhere set:
+# - DJANGO_ENV=production
+# - DEBUG=False
+DEBUG = os.environ.get('DEBUG', 'True' if not IS_PRODUCTION else 'False') == 'True'
 
-# ANTES: ALLOWED_HOSTS = []
-# DEPOIS: Usando variável de ambiente para produção
-ALLOWED_HOSTS = os.environ.get(
-    'ALLOWED_HOSTS',
-    'localhost,127.0.0.1,jreginato.pythonanywhere.com'
-).split(',')
+# Local dev keeps only localhost; production should set ALLOWED_HOSTS explicitly.
+DEFAULT_ALLOWED_HOSTS = 'localhost,127.0.0.1' if not IS_PRODUCTION else ''
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', DEFAULT_ALLOWED_HOSTS).split(',')
 
 
 # Application definition
@@ -121,6 +123,8 @@ USE_TZ = True # Mantém o uso de Timezone, mas exibe no horário de SP
 # ANTES: STATIC_URL = 'static/'
 # DEPOIS: Adicionado STATIC_ROOT para produção (collectstatic)
 STATIC_URL = 'static/'
+# For production/PythonAnywhere, collectstatic uses STATIC_ROOT.
+# Keep it configured but it is mostly ignored in local dev.
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 AUTH_USER_MODEL = "accounts.User"
