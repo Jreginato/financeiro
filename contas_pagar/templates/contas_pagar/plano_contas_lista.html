@@ -71,6 +71,10 @@ Plano de Contas
               {% endfor %}
             </tbody>
           </table>
+
+          <!-- Paginação -->
+          {% include "includes/pagination.html" %}
+
         {% else %}
           <div class="alert alert-info" role="alert">
             <i class="fas fa-info-circle"></i> Nenhuma conta cadastrada.

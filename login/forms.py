@@ -8,7 +8,8 @@ class CustomAuthenticationForm(AuthenticationForm):
         widget=forms.TextInput(attrs={
             "class": "form-control form-control-lg",
             "placeholder": "Usuário",
-            "autofocus": True
+            "autofocus": True,
+            "autocapitalize": "none"  # Desativa autocapitalize no mobile
         })
     )
     password = forms.CharField(
@@ -17,3 +18,10 @@ class CustomAuthenticationForm(AuthenticationForm):
             "placeholder": "Senha"
         })
     )
+    
+    def clean_username(self):
+        """Converte username para minúscula (case-insensitive)"""
+        username = self.cleaned_data.get('username')
+        if username:
+            return username.lower()
+        return username

@@ -21,12 +21,13 @@ from django.contrib.auth.decorators import login_required
 
 @login_required(login_url="login")
 def home(request):
-    return redirect("contas_pagar_lista")
+    return redirect("dashboard")
 
 urlpatterns = [
     path("", home, name="home"),
     path("admin/", admin.site.urls),
     path("", include("login.urls")),
+    path("dashboard/", include("dashboard.urls")),
     path("contas-pagar/", include("contas_pagar.urls")),
     path("contas-receber/", include("contas_receber.urls")),
     path("empresa/", include("empresa.urls")),

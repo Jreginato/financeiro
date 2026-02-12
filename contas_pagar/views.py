@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import calendar
 from datetime import date
 from .services.pagamento_service import PagamentoService
@@ -62,8 +63,21 @@ def contas_pagar_lista(request):
 
     contas = contas.order_by("data_vencimento")
 
+    # Paginação
+    paginator = Paginator(contas, 20)  # 20 itens por página
+    page = request.GET.get('page', 1)
+    
+    try:
+        contas_paginadas = paginator.page(page)
+    except PageNotAnInteger:
+        contas_paginadas = paginator.page(1)
+    except EmptyPage:
+        contas_paginadas = paginator.page(paginator.num_pages)
+
     context = {
-        "contas": contas,
+        "contas": contas_paginadas,
+        "page_obj": contas_paginadas,
+        "is_paginated": paginator.num_pages > 1,
         "status": "" if status == "padrao" else status,
         "data_inicio": data_inicio,
         "data_fim": data_fim,
@@ -161,8 +175,21 @@ def baixa_confirmar(request):
 def plano_contas_lista(request):
     planos = PlanoDeContas.objects.all().order_by("codigo")
 
+    # Paginação
+    paginator = Paginator(planos, 20)  # 20 itens por página
+    page = request.GET.get('page', 1)
+    
+    try:
+        planos_paginados = paginator.page(page)
+    except PageNotAnInteger:
+        planos_paginados = paginator.page(1)
+    except EmptyPage:
+        planos_paginados = paginator.page(paginator.num_pages)
+
     context = {
-        "planos": planos,
+        "planos": planos_paginados,
+        "page_obj": planos_paginados,
+        "is_paginated": paginator.num_pages > 1,
     }
 
     return render(request, "contas_pagar/plano_contas_lista.html", context)

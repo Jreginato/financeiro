@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Empresa
 from .forms import EmpresaForm
 
@@ -8,8 +9,21 @@ from .forms import EmpresaForm
 def empresa_lista(request):
     empresas = Empresa.objects.all().order_by("nome")
 
+    # Paginação
+    paginator = Paginator(empresas, 20)  # 20 itens por página
+    page = request.GET.get('page', 1)
+    
+    try:
+        empresas_paginadas = paginator.page(page)
+    except PageNotAnInteger:
+        empresas_paginadas = paginator.page(1)
+    except EmptyPage:
+        empresas_paginadas = paginator.page(paginator.num_pages)
+
     context = {
-        "empresas": empresas,
+        "empresas": empresas_paginadas,
+        "page_obj": empresas_paginadas,
+        "is_paginated": paginator.num_pages > 1,
     }
 
     return render(request, "empresa/lista.html", context)

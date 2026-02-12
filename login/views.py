@@ -8,14 +8,14 @@ from .forms import CustomAuthenticationForm
 @require_http_methods(["GET", "POST"])
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect("contas_pagar_lista")
+        return redirect("dashboard")
 
     if request.method == "POST":
         form = CustomAuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect("contas_pagar_lista")
+            return redirect("dashboard")
     else:
         form = CustomAuthenticationForm()
 

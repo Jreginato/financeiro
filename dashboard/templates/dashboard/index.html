@@ -1,0 +1,371 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Financeiro{% endblock %}
+
+{% block extra_css %}
+<style>
+    .metric-card {
+        transition: transform 0.2s;
+    }
+    .metric-card:hover {
+        transform: translateY(-5px);
+    }
+    .badge-vencidas {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.8rem;
+    }
+    .card-header {
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Dashboard Financeiro</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active">{{ mes_atual|capfirst }}</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        
+        <!-- Alertas -->
+        {% if qtd_vencidas > 0 %}
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Atenção!</strong> Você tem {{ qtd_vencidas }} conta{{ qtd_vencidas|pluralize }} vencida{{ qtd_vencidas|pluralize }} no valor de R$ {{ total_vencidas|floatformat:2 }}
+                    <a href="{% url 'contas_pagar_lista' %}?status=atrasada" class="alert-link">Ver contas</a>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if qtd_vencendo > 0 %}
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="fas fa-clock"></i>
+                    {{ qtd_vencendo }} conta{{ qtd_vencendo|pluralize }} vencendo nos próximos 7 dias - Total: R$ {{ total_vencendo|floatformat:2 }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Cards de Métricas -->
+        <div class="row">
+            <!-- Contas Vencidas -->
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger metric-card">
+                    <div class="inner">
+                        <h3>R$ {{ total_vencidas|floatformat:2 }}</h3>
+                        <p>Contas Vencidas</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <a href="{% url 'contas_pagar_lista' %}?status=atrasada" class="small-box-footer">
+                        {{ qtd_vencidas }} conta{{ qtd_vencidas|pluralize }} <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Vencendo em 7 dias -->
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning metric-card">
+                    <div class="inner">
+                        <h3>R$ {{ total_vencendo|floatformat:2 }}</h3>
+                        <p>Vence em 7 dias</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <a href="{% url 'contas_pagar_lista' %}" class="small-box-footer">
+                        {{ qtd_vencendo }} conta{{ qtd_vencendo|pluralize }} <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Total a Pagar no Mês -->
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-info metric-card">
+                    <div class="inner">
+                        <h3>R$ {{ total_pagar_mes|floatformat:2 }}</h3>
+                        <p>A Pagar este Mês</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                    <a href="{% url 'contas_pagar_lista' %}?status=pendente" class="small-box-footer">
+                        Ver detalhes <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Saldo Projetado -->
+            <div class="col-lg-3 col-6">
+                <div class="small-box {% if saldo_projetado >= 0 %}bg-success{% else %}bg-danger{% endif %} metric-card">
+                    <div class="inner">
+                        <h3>R$ {{ saldo_projetado|floatformat:2 }}</h3>
+                        <p>Saldo Projetado</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">
+                        Receitas - Despesas <i class="fas fa-info-circle"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Resumo Financeiro -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary">
+                        <h3 class="card-title"><i class="fas fa-chart-line"></i> Resumo do Mês</h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Previsto a Pagar:</strong></td>
+                                <td class="text-right text-danger">R$ {{ total_previsto_mes|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Já Pago:</strong></td>
+                                <td class="text-right text-muted">R$ {{ total_pago_mes|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>A Receber:</strong></td>
+                                <td class="text-right text-success">R$ {{ total_receber_mes|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Já Recebido:</strong></td>
+                                <td class="text-right text-muted">R$ {{ total_recebido_mes|floatformat:2 }}</td>
+                            </tr>
+                            <tr class="border-top">
+                                <td><strong>Saldo Projetado:</strong></td>
+                                <td class="text-right {% if saldo_projetado >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    <strong>R$ {{ saldo_projetado|floatformat:2 }}</strong>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-warning">
+                        <h3 class="card-title"><i class="fas fa-list"></i> Próximas Contas</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-sm table-hover">
+                            <tbody>
+                                {% for conta in proximas_contas %}
+                                <tr>
+                                    <td style="width: 80px">
+                                        <span class="badge badge-{% if conta.data_vencimento < hoje %}danger{% elif conta.data_vencimento == hoje %}warning{% else %}info{% endif %}">
+                                            {{ conta.data_vencimento|date:"d/m" }}
+                                        </span>
+                                    </td>
+                                    <td>{{ conta.descricao|truncatewords:5 }}</td>
+                                    <td class="text-right">
+                                        <strong>R$ {{ conta.valor|floatformat:2 }}</strong>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">
+                                        <em>Nenhuma conta pendente</em>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer text-center">
+                        <a href="{% url 'contas_pagar_lista' %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-list"></i> Ver Todas
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gráficos -->
+        <div class="row">
+            <!-- Gráfico de Categorias -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-info">
+                        <h3 class="card-title"><i class="fas fa-chart-pie"></i> Gastos por Categoria</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="categoriasChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gráfico de Evolução -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success">
+                        <h3 class="card-title"><i class="fas fa-chart-line"></i> Evolução Mensal (6 meses)</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="evolucaoChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Maiores Despesas -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-danger">
+                        <h3 class="card-title"><i class="fas fa-fire"></i> Maiores Despesas do Mês</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Vencimento</th>
+                                    <th>Descrição</th>
+                                    <th>Categoria</th>
+                                    <th>Status</th>
+                                    <th class="text-right">Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for conta in maiores_despesas %}
+                                <tr>
+                                    <td>{{ conta.data_vencimento|date:"d/m/Y" }}</td>
+                                    <td>{{ conta.descricao }}</td>
+                                    <td>
+                                        {% if conta.plano_contas %}
+                                            <span class="badge badge-secondary">{{ conta.plano_contas.nome }}</span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-{% if conta.status == 'paga' %}success{% elif conta.status == 'atrasada' %}danger{% else %}warning{% endif %}">
+                                            {{ conta.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td class="text-right">
+                                        <strong>R$ {{ conta.valor|floatformat:2 }}</strong>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted"><em>Nenhuma despesa registrada</em></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+<script>
+// Gráfico de Categorias (Pizza)
+const ctxCategorias = document.getElementById('categoriasChart').getContext('2d');
+const categoriasChart = new Chart(ctxCategorias, {
+    type: 'doughnut',
+    data: {
+        labels: {{ categorias_labels|safe }},
+        datasets: [{
+            data: {{ categorias_valores|safe }},
+            backgroundColor: [
+                '#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc',
+                '#d2d6de', '#ff851b', '#01ff70', '#39cccc', '#dd4b39'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+            }
+        }
+    }
+});
+
+// Gráfico de Evolução (Linhas)
+const ctxEvolucao = document.getElementById('evolucaoChart').getContext('2d');
+const evolucaoChart = new Chart(ctxEvolucao, {
+    type: 'line',
+    data: {
+        labels: {{ meses_data|safe }},
+        datasets: [
+            {
+                label: 'Pago',
+                data: {{ meses_pago|safe }},
+                borderColor: '#f56954',
+                backgroundColor: 'rgba(245, 105, 84, 0.2)',
+                tension: 0.4
+            },
+            {
+                label: 'Recebido',
+                data: {{ meses_recebido|safe }},
+                borderColor: '#00a65a',
+                backgroundColor: 'rgba(0, 166, 90, 0.2)',
+                tension: 0.4
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return 'R$ ' + value.toLocaleString('pt-BR');
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import calendar
 from .models import ContaReceber
 from .forms import ContaReceberForm
@@ -61,8 +62,21 @@ def contas_receber_lista(request):
 
     contas = contas.order_by("data_vencimento")
 
+    # Paginação
+    paginator = Paginator(contas, 20)  # 20 itens por página
+    page = request.GET.get('page', 1)
+    
+    try:
+        contas_paginadas = paginator.page(page)
+    except PageNotAnInteger:
+        contas_paginadas = paginator.page(1)
+    except EmptyPage:
+        contas_paginadas = paginator.page(paginator.num_pages)
+
     context = {
-        "contas": contas,
+        "contas": contas_paginadas,
+        "page_obj": contas_paginadas,
+        "is_paginated": paginator.num_pages > 1,
         "status": "" if status == "padrao" else status,
         "data_inicio": data_inicio,
         "data_fim": data_fim,

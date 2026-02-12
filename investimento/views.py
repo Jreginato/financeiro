@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
 import calendar
 from .models import Investimento
@@ -46,8 +47,21 @@ def investimento_lista(request):
 
     investimentos = investimentos.order_by('-data_operacao', '-criado_em')
 
+    # Paginação
+    paginator = Paginator(investimentos, 20)  # 20 itens por página
+    page = request.GET.get('page', 1)
+    
+    try:
+        investimentos_paginados = paginator.page(page)
+    except PageNotAnInteger:
+        investimentos_paginados = paginator.page(1)
+    except EmptyPage:
+        investimentos_paginados = paginator.page(paginator.num_pages)
+
     context = {
-        "investimentos": investimentos,
+        "investimentos": investimentos_paginados,
+        "page_obj": investimentos_paginados,
+        "is_paginated": paginator.num_pages > 1,
         "tipo_ativo": tipo_ativo,
         "tipo_operacao": tipo_operacao,
         "data_inicio": data_inicio,

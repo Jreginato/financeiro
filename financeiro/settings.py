@@ -39,6 +39,11 @@ DEBUG = False
 # OPÇÃO 2: Edite diretamente aqui (menos flexível)
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'jreginato.pythonanywhere.com').split(',')
 
+# CSRF Trusted Origins - Necessário para PWA e requisições AJAX
+CSRF_TRUSTED_ORIGINS = [
+    'https://jreginato.pythonanywhere.com',
+]
+
 # Exemplo de uso com variável de ambiente no PythonAnywhere:
 # No arquivo .bashrc ou direto no WSGI:
 # export ALLOWED_HOSTS='seuusername.pythonanywhere.com,www.seudominio.com.br'
@@ -58,6 +63,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "accounts",
     "login",
+    "dashboard",
     "contas_pagar",
     "contas_receber",
     "empresa",
@@ -190,6 +196,8 @@ STATICFILES_DIRS = [
 # Cookies de sessão seguros
 SESSION_COOKIE_SECURE = True  # Apenas HTTPS
 CSRF_COOKIE_SECURE = True     # Apenas HTTPS
+SESSION_COOKIE_SAMESITE = 'Lax'  # Permite PWA funcionar corretamente
+CSRF_COOKIE_SAMESITE = 'Lax'     # Permite PWA funcionar corretamente
 
 # Proteção contra clickjacking
 X_FRAME_OPTIONS = 'DENY'
@@ -214,7 +222,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 AUTH_USER_MODEL = "accounts.User"
 
 LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "contas_pagar_lista"
+LOGIN_REDIRECT_URL = "dashboard"
 
 
 # ==============================================================================
