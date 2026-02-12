@@ -18,6 +18,17 @@
     .card-header {
         font-weight: 600;
     }
+    /* Ajuste de fonte nos cards para valores grandes */
+    .small-box .inner h3 {
+        font-size: 1.8rem;
+        word-break: break-word;
+        line-height: 1.2;
+    }
+    @media (max-width: 767px) {
+        .small-box .inner h3 {
+            font-size: 1.4rem;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -247,7 +258,8 @@
                         <h3 class="card-title"><i class="fas fa-fire"></i> Maiores Despesas do Mês</h3>
                     </div>
                     <div class="card-body p-0">
-                        <table class="table table-striped">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
                             <thead>
                                 <tr>
                                     <th>Vencimento</th>
@@ -263,8 +275,8 @@
                                     <td>{{ conta.data_vencimento|date:"d/m/Y" }}</td>
                                     <td>{{ conta.descricao }}</td>
                                     <td>
-                                        {% if conta.plano_contas %}
-                                            <span class="badge badge-secondary">{{ conta.plano_contas.nome }}</span>
+                                        {% if conta.plano_conta %}
+                                            <span class="badge badge-secondary">{{ conta.plano_conta.nome }}</span>
                                         {% else %}
                                             <span class="text-muted">-</span>
                                         {% endif %}
@@ -285,6 +297,7 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 </div>
             </div>
