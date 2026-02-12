@@ -12,6 +12,7 @@
     <form method="POST" action="{% url 'contas_receber_recebimento_confirmar' %}">
         {% csrf_token %}
 
+        <div class="table-responsive">
         <table class="table table-bordered table-striped mt-3">
             <thead>
                 <tr>
@@ -48,6 +49,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
 
         <div class="card-footer text-right">
             <button class="btn btn-success">

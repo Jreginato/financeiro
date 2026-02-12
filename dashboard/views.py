@@ -171,7 +171,6 @@ def dashboard(request):
         
         # Data atual
         'hoje': hoje,
-        'mes_atual': hoje.strftime('%B/%Y'),
     }
     
     return render(request, 'dashboard/index.html', context)
