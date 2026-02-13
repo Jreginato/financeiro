@@ -1,14 +1,8 @@
 """
-Django settings for financeiro project - PRODUÇÃO (PythonAnywhere)
+Django settings for financeiro project - DESENVOLVIMENTO LOCAL
 
-IMPORTANTE: Este arquivo é para ambiente de PRODUÇÃO no PythonAnywhere.
-Para desenvolvimento local, use settings.py
-
-Para usar este arquivo no PythonAnywhere:
-1. No arquivo wsgi.py, altere:
-   os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'financeiro.settings_2')
-   
-2. Configure as variáveis abaixo conforme seu ambiente
+IMPORTANTE: Este arquivo é para ambiente de DESENVOLVIMENTO.
+Para produção no PythonAnywhere, use settings_2.py (renomeie para settings.py)
 """
 
 import os
@@ -22,27 +16,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # CONFIGURAÇÕES DE SEGURANÇA - PRODUÇÃO
 # ==============================================================================
 
-# ATENÇÃO: Configure a SECRET_KEY
-# OPÇÃO 1: Defina a variável de ambiente DJANGO_SECRET_KEY (recomendado)
-# OPÇÃO 2: Edite diretamente aqui (menos seguro)
-# Use: python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
-SECRET_KEY = os.environ.get(
-    'DJANGO_SECRET_KEY',
-    'ALTERE-ESTA-CHAVE-PARA-UMA-CHAVE-SECRETA-UNICA-E-ALEATORIA'
-)
+SECRET_KEY = 'django-insecure-dev-key-mude-em-producao-12345'
 
-# DEBUG deve ser False em produção!
-DEBUG = False
+# DEBUG ativo em desenvolvimento
+DEBUG = True
 
-# ATENÇÃO: Configure o ALLOWED_HOSTS
-# OPÇÃO 1: Defina a variável de ambiente ALLOWED_HOSTS
-# OPÇÃO 2: Edite diretamente aqui (menos flexível)
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'jreginato.pythonanywhere.com').split(',')
-
-# CSRF Trusted Origins - Necessário para PWA e requisições AJAX
-CSRF_TRUSTED_ORIGINS = [
-    'https://jreginato.pythonanywhere.com',
-]
+# ALLOWED_HOSTS para desenvolvimento local
+ALLOWED_HOSTS = []
 
 # Exemplo de uso com variável de ambiente no PythonAnywhere:
 # No arquivo .bashrc ou direto no WSGI:
@@ -163,20 +143,16 @@ USE_TZ = True
 
 
 # ==============================================================================
-# STATIC FILES (CSS, JavaScript, Images) - PRODUÇÃO
+# STATIC FILES (CSS, JavaScript, Images) - DESENVOLVIMENTO
 # ==============================================================================
 
 STATIC_URL = '/static/'
 
-# IMPORTANTE: No PythonAnywhere, após fazer deploy:
-# 1. Execute: python manage.py collectstatic
-# 2. Configure o mapeamento estático na aba "Web":
-#    URL: /static/
-#    Directory: /home/jreginato/financeiro_repo/staticfiles
+# Para desenvolvimento, o Django serve arquivos estáticos automaticamente
+# STATIC_ROOT é usado apenas em produção (collectstatic)
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Arquivos estáticos adicionais (PWA: manifest.json, service-worker.js, icons, etc)
-# Necessário para collectstatic encontrar os arquivos da pasta static/
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
@@ -191,29 +167,20 @@ STATICFILES_DIRS = [
 
 
 # ==============================================================================
-# SEGURANÇA ADICIONAL - PRODUÇÃO
+# SEGURANÇA ADICIONAL - DESENVOLVIMENTO
 # ==============================================================================
 
-# Cookies de sessão seguros
-SESSION_COOKIE_SECURE = True  # Apenas HTTPS
-CSRF_COOKIE_SECURE = True     # Apenas HTTPS
-SESSION_COOKIE_SAMESITE = 'Lax'  # Permite PWA funcionar corretamente
-CSRF_COOKIE_SAMESITE = 'Lax'     # Permite PWA funcionar corretamente
+# Em desenvolvimento, cookies não precisam ser secure
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
 
 # Proteção contra clickjacking
-X_FRAME_OPTIONS = 'DENY'
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
-# Força HTTPS
-SECURE_SSL_REDIRECT = False  # PythonAnywhere já faz isso, deixe False
-
-# HSTS (HTTP Strict Transport Security)
-SECURE_HSTS_SECONDS = 31536000  # 1 ano
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
-
-# Proteção contra XSS
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
+# Força HTTPS - Desabilitado em desenvolvimento
+SECURE_SSL_REDIRECT = False
 
 
 # ==============================================================================
@@ -235,7 +202,7 @@ JAZZMIN_SETTINGS = {
     "site_header": "Administração do Sistema Financeiro",
     "welcome_sign": "Bem-vindo ao Painel Administrativo",
     "copyright": "Sistema Financeiro © 2026",
-    "show_ui_builder": False,  # Desabilitado em produção
+    "show_ui_builder": True,  # Ativo em desenvolvimento
 }
 
 JAZZMIN_UI_TWEAKS = {
@@ -243,46 +210,6 @@ JAZZMIN_UI_TWEAKS = {
     "navbar": "navbar-dark",
     "sidebar": "sidebar-dark-primary",
     "footer_fixed": False,
-}
-
-
-# ==============================================================================
-# LOGGING - PRODUÇÃO
-# ==============================================================================
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'file': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'django_errors.log'),
-            'formatter': 'verbose',
-        },
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-    },
-    'root': {
-        'handlers': ['console', 'file'],
-        'level': 'INFO',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-    },
 }
 
 
