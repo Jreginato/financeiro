@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block page_title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h3 class="card-title mb-0">
+            <i class="fa fa-sync-alt"></i> {{ titulo }}
+        </h3>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger m-3">{{ form.non_field_errors }}</div>
+        {% endif %}
+        {% if form.errors %}
+            <div class="alert alert-warning m-3">Existem erros no formulário. Verifique os campos marcados.</div>
+        {% endif %}
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="{{ form.descricao.id_for_label }}">Descrição *</label>
+                        {{ form.descricao }}
+                        {% if form.descricao.errors %}
+                            <span class="text-danger">{{ form.descricao.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.fornecedor.id_for_label }}">Fornecedor *</label>
+                        {{ form.fornecedor }}
+                        {% if form.fornecedor.errors %}
+                            <span class="text-danger">{{ form.fornecedor.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.plano_conta.id_for_label }}">Plano de Contas *</label>
+                        {{ form.plano_conta }}
+                        {% if form.plano_conta.errors %}
+                            <span class="text-danger">{{ form.plano_conta.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="{{ form.valor.id_for_label }}">Valor *</label>
+                        {{ form.valor }}
+                        {% if form.valor.errors %}
+                            <span class="text-danger">{{ form.valor.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="{{ form.periodicidade.id_for_label }}">Periodicidade *</label>
+                        {{ form.periodicidade }}
+                        {% if form.periodicidade.errors %}
+                            <span class="text-danger">{{ form.periodicidade.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="{{ form.dia_vencimento.id_for_label }}">Dia do Vencimento *</label>
+                        {{ form.dia_vencimento }}
+                        {% if form.dia_vencimento.errors %}
+                            <span class="text-danger">{{ form.dia_vencimento.errors.0 }}</span>
+                        {% endif %}
+                        <small class="form-text text-muted">Entre 1 e 28</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="{{ form.data_inicio.id_for_label }}">Data de Início *</label>
+                        {{ form.data_inicio }}
+                        {% if form.data_inicio.errors %}
+                            <span class="text-danger">{{ form.data_inicio.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="{{ form.data_cancelamento.id_for_label }}">Data de Cancelamento</label>
+                        {{ form.data_cancelamento }}
+                        {% if form.data_cancelamento.errors %}
+                            <span class="text-danger">{{ form.data_cancelamento.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="{{ form.status.id_for_label }}">Status *</label>
+                        {{ form.status }}
+                        {% if form.status.errors %}
+                            <span class="text-danger">{{ form.status.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="{{ form.observacoes.id_for_label }}">Observações</label>
+                        {{ form.observacoes }}
+                        {% if form.observacoes.errors %}
+                            <span class="text-danger">{{ form.observacoes.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer text-right">
+            <button type="submit" class="btn btn-success">
+                <i class="fa fa-check"></i> Salvar
+            </button>
+            <a href="{% url 'assinatura_lista' %}" class="btn btn-secondary">
+                <i class="fa fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('.money').mask('000.000.000,00', {reverse: true});
+    $('.select2').select2({
+        theme: 'bootstrap4',
+        width: '100%'
+    });
+});
+</script>
+
+{% endblock %}

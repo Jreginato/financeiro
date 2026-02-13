@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block page_title %}Confirmar exclusão{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-danger text-white">
+        <h3 class="card-title mb-0">
+            <i class="fa fa-exclamation-triangle"></i> Confirmar exclusão
+        </h3>
+    </div>
+
+    <div class="card-body">
+        <p>Você tem certeza que deseja excluir a assinatura:</p>
+        <p><strong>{{ assinatura.descricao }}</strong> - {{ assinatura.fornecedor }} (R$ {{ assinatura.valor }})?</p>
+        <p class="text-muted">Esta ação não pode ser desfeita.</p>
+    </div>
+
+    <div class="card-footer text-right">
+        <form method="post" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                <i class="fa fa-trash"></i> Sim, excluir
+            </button>
+        </form>
+        <a href="{% url 'assinatura_lista' %}" class="btn btn-secondary">
+            <i class="fa fa-times"></i> Cancelar
+        </a>
+    </div>
+</div>
+
+{% endblock %}

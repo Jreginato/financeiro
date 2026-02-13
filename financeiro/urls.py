@@ -32,5 +32,6 @@ urlpatterns = [
     path("contas-receber/", include("contas_receber.urls")),
     path("empresa/", include("empresa.urls")),
     path("investimento/", include("investimento.urls")),
+    path("assinatura/", include("assinatura.urls")),
 ]
 

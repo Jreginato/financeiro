@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Assinaturas{% endblock %}
+{% block page_title %}Assinaturas{% endblock %}
+
+{% block content %}
+
+<div class="mb-3 d-flex justify-content-between">
+    <div>
+        <a href="{% url 'assinatura_criar' %}" class="btn btn-success">
+            <i class="fa fa-plus"></i> Nova assinatura
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Filtros</h3>
+    </div>
+
+    <div class="card-body">
+        <form method="get" class="row">
+            <div class="col-md-4">
+                <label>Status</label>
+                <select name="status" class="form-control">
+                    <option value="">Todos</option>
+                    <option value="ativa" {% if status == "ativa" %}selected{% endif %}>Ativa</option>
+                    <option value="suspensa" {% if status == "suspensa" %}selected{% endif %}>Suspensa</option>
+                    <option value="cancelada" {% if status == "cancelada" %}selected{% endif %}>Cancelada</option>
+                </select>
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-primary w-100">
+                    <i class="fa fa-filter"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title">Listagem de assinaturas</h3>
+    </div>
+
+    <div class="card-body table-responsive p-0">
+        <table class="table table-hover text-nowrap">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Descrição</th>
+                    <th>Fornecedor</th>
+                    <th>Plano de Contas</th>
+                    <th>Valor</th>
+                    <th>Periodicidade</th>
+                    <th>Dia Venc.</th>
+                    <th>Status</th>
+                    <th>Início</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for assinatura in assinaturas %}
+                <tr>
+                    <td>{{ assinatura.id }}</td>
+                    <td>{{ assinatura.descricao }}</td>
+                    <td>{{ assinatura.fornecedor }}</td>
+                    <td>{{ assinatura.plano_conta }}</td>
+                    <td>R$ {{ assinatura.valor }}</td>
+                    <td>{{ assinatura.get_periodicidade_display }}</td>
+                    <td>{{ assinatura.dia_vencimento }}</td>
+                    <td>
+                        <span class="badge badge-{% if assinatura.status == 'ativa' %}success{% elif assinatura.status == 'suspensa' %}warning{% else %}danger{% endif %}">
+                            {{ assinatura.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ assinatura.data_inicio|date:"d/m/Y" }}</td>
+
+                    <td class="text-right">
+                        <a href="{% url 'assinatura_editar' assinatura.id %}" class="btn btn-sm btn-primary">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                        <a href="{% url 'assinatura_excluir' assinatura.id %}" class="btn btn-sm btn-danger">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10" class="text-center p-4">
+                        Nenhuma assinatura encontrada.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Paginação -->
+        {% include "includes/pagination.html" %}
+
+    </div>
+</div>
+
+{% endblock %}
