@@ -32,16 +32,16 @@
                     <td>R$ {{ conta.valor }}</td>
 
                     <td>
-                        <input type="date"
+                           <input type="date"
                                name="data_pagamento_{{ conta.id }}"
-                               class="form-control"
+                               class="form-control pagamento-data"
                                value="{{ hoje }}">
                     </td>
 
                     <td>
-                        <input type="text"
+                           <input type="text"
                                name="valor_pago_{{ conta.id }}"
-                               class="form-control money"
+                               class="form-control money valor-pago"
                                value="{{ conta.valor }}">
                     </td>
 
@@ -66,7 +66,30 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 <script>
+function formatTodayForDateInput() {
+    var today = new Date();
+    var year = today.getFullYear();
+    var month = String(today.getMonth() + 1).padStart(2, '0');
+    var day = String(today.getDate()).padStart(2, '0');
+    return year + '-' + month + '-' + day;
+}
+
 $('.money').mask('000.000.000,00', {reverse: true});
+
+var todayValue = formatTodayForDateInput();
+$('.pagamento-data').each(function () {
+    if (!this.value) {
+        this.value = todayValue;
+    }
+});
 </script>
+
+<style>
+.valor-pago {
+    min-width: 140px;
+    font-size: 1rem;
+    padding: 0.5rem 0.75rem;
+}
+</style>
 
 {% endblock %}
